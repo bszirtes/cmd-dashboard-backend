@@ -23,32 +23,27 @@ jobs:
           echo tag=${branch#release/} >> $GITHUB_OUTPUT
         id: get-tag-step
 
-  check-gomod-deps:
-    needs: get-tag
-    uses: networkservicemesh/.github/.github/workflows/check-gomod-deps.yaml@main
-    with:
-      tag: ${{ needs.get-tag.outputs.tag }}
-
   create-release:
     needs: [get-tag, check-gomod-deps]
     uses: networkservicemesh/.github/.github/workflows/release.yaml@main
     secrets:
       token: ${{ secrets.NSM_BOT_GITHUB_TOKEN }}
 
-  docker:
-    needs: [get-tag, check-gomod-deps]
-    uses: networkservicemesh/.github/.github/workflows/docker-release.yaml@main
-    with:
-      tag: ${{ needs.get-tag.outputs.tag }}
-    secrets:
-      token: ${{ secrets.GITHUB_TOKEN }}
+  release-dependent-repositories:
+    name: Update cmd-backend-ui repository
+    runs-on: ubuntu-latest
+    needs: get-tag
+    steps:
+      - name: Checkout networkservicemesh/cmd-backend-ui repository
+        uses: actions/checkout@v4
+        with:
+          path: bszirtes/cmd-backend-ui
+          repository: bszirtes/cmd-backend-ui
+          token: ${{ secrets.NSM_BOT_GITHUB_TOKEN }}
 
-  update-deployments-k8s:
-    name: Update deployments-k8s
-    needs: [get-tag, create-release]
-    if: ${{ github.repository != 'networkservicemesh/cmd-template' }}
-    uses: networkservicemesh/.github/.github/workflows/release-deployments.yaml@main
-    with:
-      tag: ${{ needs.get-tag.outputs.tag }}
-    secrets:
-      token: ${{ secrets.NSM_BOT_GITHUB_TOKEN }}
+      - name: Push branch to the cmd-backend-ui
+        working-directory: bszirtes/cmd-backend-ui
+        run: |
+          echo Starting to release repository cmd-backend-ui
+          git checkout -b ${{ github.event.workflow_run.head_branch }}
+          git push -f origin ${{ github.event.workflow_run.head_branch }}
