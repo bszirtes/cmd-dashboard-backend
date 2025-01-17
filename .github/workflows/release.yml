@@ -27,7 +27,7 @@ jobs:
     needs: get-tag
     uses: networkservicemesh/.github/.github/workflows/release.yaml@main
     secrets:
-      token: ${{ secrets.NSM_BOT_GITHUB_TOKEN }}
+      token: ${{ secrets.BOT_TOKEN }}
 
   release-dependent-repositories:
     name: Update cmd-backend-ui repository
@@ -39,7 +39,7 @@ jobs:
         with:
           path: bszirtes/cmd-backend-ui
           repository: bszirtes/cmd-backend-ui
-          token: ${{ secrets.NSM_BOT_GITHUB_TOKEN }}
+          token: ${{ secrets.BOT_TOKEN }}
 
       - name: Push branch to the cmd-backend-ui
         working-directory: bszirtes/cmd-backend-ui
