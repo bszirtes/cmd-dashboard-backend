@@ -30,19 +30,19 @@ jobs:
       token: ${{ secrets.BOT_TOKEN }}
 
   release-dependent-repositories:
-    name: Update cmd-backend-ui repository
+    name: Update cmd-dashboard-ui repository
     runs-on: ubuntu-latest
     needs: get-tag
     steps:
-      - name: Checkout networkservicemesh/cmd-backend-ui repository
+      - name: Checkout bszirtes/cmd-dashboard-ui repository
         uses: actions/checkout@v4
         with:
-          path: bszirtes/cmd-backend-ui
-          repository: bszirtes/cmd-backend-ui
+          path: bszirtes/cmd-dashboard-ui
+          repository: bszirtes/cmd-dashboard-ui
           token: ${{ secrets.BOT_TOKEN }}
 
-      - name: Push branch to the cmd-backend-ui
-        working-directory: bszirtes/cmd-backend-ui
+      - name: Push branch to the cmd-dashboard-ui
+        working-directory: bszirtes/cmd-dashboard-ui
         run: |
           echo Starting to release repository cmd-backend-ui
           git checkout -b ${{ github.event.workflow_run.head_branch }}
